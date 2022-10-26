@@ -5,10 +5,10 @@ import { NextFunction, Request, Response } from "express";
 const createJob = async (req: Request, res: Response) => {
     const { topic, job_detail_1, job_detail_2, staff_req, department_req, ref_loss_cost_reduction, share_cost, status, job_type }: IJob = req.body
     // console.log(req.body)
-    console.log(req.files)
+    // console.log(req.files)
     // Find next job number
     const jobCount = await nextJobNo()
-    JobModel.create({
+    const jobCreateRes = await JobModel.create({
         job_no: `COM${String(jobCount).padStart(4, "0")}`,
         topic,
         job_detail_1,
@@ -19,19 +19,14 @@ const createJob = async (req: Request, res: Response) => {
         share_cost,
         status,
         job_type,
-    }, (err, createdJob) => {
-        if (req.files) {
-            //TODO insert files to attachments field
-            createdJob.save()
-        }
-        res.statusCode === 200 ? res.json({ msg: 'เพิ่มข้อมูลสำเร็จ' }) : res.json({ msg: 'เกิดข้อผิดพลาด ไม่สามารถเพิ่มข้อมูล' })
     })
-    // if (jobCreateRes) {
-    //     res.status(200).json({
-    //         msg: 'เพิ่มคำร้องของานใหม่สำเร็จ',
-    //     })
-    //     return
-    // }
+    if (jobCreateRes) {
+        res.json({
+            msg: 'เพิ่มคำร้องของานใหม่สำเร็จ',
+            jobCreateRes
+        })
+        return
+    }
 }
 
 async function nextJobNo(): Promise<number> {

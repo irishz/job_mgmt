@@ -1,33 +1,47 @@
 import express from 'express'
-import { config } from 'dotenv'
+import dotenv from 'dotenv'
+dotenv.config()
 import * as bodyParser from 'body-parser'
 import userRoute from './routes/user-routes'
 import jobRoute from './routes/job-routes'
 import programRoute from './routes/program-routes'
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 import cors, { CorsOptions } from 'cors'
 import DBConnection from './db'
 
-config()
-const { port, db_uri } = process.env
+const { port, DB_URI } = process.env
 
 mongoose.Promise = global.Promise
 // mongoose.connect(`${db_uri}`)
 DBConnection();
 
-const allowedOrigins = ['http://127.0.0.1:5173', 'http://192.168.2.197:5173'];
+const allowedOrigins = [
+    'http://192.168.2.13:9090',
+    'http://127.0.0.1:9090',
+    'http://localhost:9090',
+    "http://192.168.2.13:5173",
+    "http://localhost:5173"
+];
+
 const options: CorsOptions = {
     origin: allowedOrigins,
+    credentials: true,
+    allowedHeaders: ["Origin", "Content-Type"],
+    methods: ['GET', 'POST', 'PUT', 'PATCH' , 'DELETE', 'OPTIONS'],
 }
 
 const app = express()
-
-app.use(cors(options))
+// app.use(cors())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: true
 }))
+
+
+app.get("/", (req, res) => {
+    res.send(`Database URI: ${DB_URI}`);
+})
 
 app.use("/users", userRoute)
 app.use("/job", jobRoute)

@@ -6,7 +6,7 @@ declare global {
             PORT: number,
             DB_URI: string,
             JWT_TOKEN: Secret,
-            ALLOW_ORIGIN: string[],
+            NODE_ENV: string,
         }
     }
 }

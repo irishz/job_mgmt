@@ -108,23 +108,23 @@ function JobCreate() {
       share_cost,
       job_type,
     } = data;
-    // let formData = data
-    let formData = new FormData();
+    let formData = data
+    // let formData = new FormData();
     if (authCtx?.userData) {
-      formData.append("topic", topic);
-      formData.append("staff_req", authCtx?.userData?._id);
-      formData.append("department_req", authCtx?.userData?.department);
-      formData.append("job_detail_1", job_detail_1);
-      formData.append("job_detail_2", job_detail_2);
-      formData.append("ref_loss_cost_reduction", ref_loss_cost_reduction);
-      formData.append("share_cost", share_cost.toString());
-      formData.append("status", "wait for approve");
-      formData.append("job_type", job_type);
-      fileList.map((file) => formData.append("attachments", file));
-    //   formData.staff_req = authCtx?.userData?._id;
-    //   formData.department_req = authCtx?.userData?.department;
-    //   formData.status = "wait for approve";
-    //   formData.share_cost = data.share_cost;
+      // formData.append("topic", topic);
+      // formData.append("staff_req", authCtx?.userData?._id);
+      // formData.append("department_req", authCtx?.userData?.department);
+      // formData.append("job_detail_1", job_detail_1);
+      // formData.append("job_detail_2", job_detail_2);
+      // formData.append("ref_loss_cost_reduction", ref_loss_cost_reduction);
+      // formData.append("share_cost", share_cost.toString());
+      // formData.append("status", "wait for approve");
+      // formData.append("job_type", job_type);
+      // fileList.map((file) => formData.append("attachments", file));
+      formData.staff_req = authCtx?.userData?._id;
+      formData.department_req = authCtx?.userData?.department;
+      formData.status = "wait for approve";
+      formData.share_cost = data.share_cost;
     //   formData.attachments = fileList
     }
     console.log(formData);
@@ -133,11 +133,15 @@ function JobCreate() {
       setisLoading(false);
     }, 1000);
 
-    const config: AxiosRequestConfig = {
-      headers: { "Content-Type": "multipart/form-data" },
-    };
+    // const config: AxiosRequestConfig = {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    //   },
+    // };
     axios
-      .post(`${API_URL}/job`, formData, config)
+      .post(`${API_URL}/job`, formData)
       .then((res: AxiosResponse) => {
         if (res) {
           toast({

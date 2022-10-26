@@ -6,7 +6,6 @@ import * as Jwt from 'jsonwebtoken';
 
 const registerUser = async (req: Request, res: Response): Promise<void> => {
     const { name, role, department, employee_code, password }: IUser = req.body
-
     // Check user exists
     const userExist: IUser | null = await UserModel.findOne({ employee_code })
     if (userExist) {
@@ -32,7 +31,10 @@ const registerUser = async (req: Request, res: Response): Promise<void> => {
             data: userCreateRes
         })
     } else {
-        throw new Error("Data not found!")
+        res.json({
+            msg: 'Data not found!',
+        })
+        // throw new Error("Data not found!")
     }
 }
 
