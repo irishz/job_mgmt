@@ -9,7 +9,7 @@ import { Input, useToast } from "@chakra-ui/react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 import ICredentials from "../../types/credentials";
 import { user } from "../../types/user-types";
 
@@ -42,7 +42,7 @@ function Login({ setuserToken }: user) {
         // console.log(error)
         if (axios.isAxiosError(error) && error.response) {
           toast({
-            title: `เกิดข้อผิดพลาด ${error.response?.statusText}: ${error.response.status}`,
+            title: `เกิดข้อผิดพลาด!`,
             description: error.response?.data.msg,
             status: "error",
             isClosable: true,
@@ -95,6 +95,7 @@ function Login({ setuserToken }: user) {
               type={"text"}
               autoFocus
               maxLength={7}
+              placeholder="xxxxxxx"
             />
             <FormHelperText color={"red"}>
               {errors.employee_code?.message}
@@ -110,12 +111,49 @@ function Login({ setuserToken }: user) {
               bgColor={"whiteAlpha.700"}
               borderColor={errors.password ? "red.500" : "whiteAlpha.600"}
               type={"password"}
+              placeholder="******"
             />
             <FormHelperText color="red">
               {errors.password?.message}
             </FormHelperText>
           </FormControl>
           {/* Login Button */}
+          <Flex justifyContent={"space-between"} fontSize="sm">
+            <Flex gap={1} alignItems="baseline">
+              <Text>เข้าใช้งานครั้งแรก?</Text>
+              <Link to="/register">
+                <Text
+                  color={"pink.700"}
+                  _hover={{
+                    color: "pink.500",
+                    fontWeight: "semibold",
+                    cursor: "pointer",
+                  }}
+                  textDecorationLine={"underline"}
+                  textUnderlineOffset={3}
+                  fontSize="md"
+                >
+                  ลงทะเบียน
+                </Text>
+              </Link>
+            </Flex>
+            <Flex gap={1} alignItems="baseline">
+              <Text>ลืมรหัสผ่าน?</Text>
+              <Text
+                color={"pink.700"}
+                _hover={{
+                  color: "pink.500",
+                  fontWeight: "semibold",
+                  cursor: "pointer",
+                }}
+                textDecorationLine={"underline"}
+                textUnderlineOffset={3}
+                onClick={() => navigate("/forgot-password", { replace: true })}
+              >
+                เปลี่ยนรหัสผ่าน
+              </Text>
+            </Flex>
+          </Flex>
           <Button
             type="submit"
             variant={"solid"}

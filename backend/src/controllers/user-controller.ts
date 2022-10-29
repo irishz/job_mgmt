@@ -88,6 +88,15 @@ const getOneUser = async (req: Request, res: Response): Promise<void> => {
     })
 }
 
+const getUserByEmpCode = async (req: Request, res: Response): Promise<void> => {
+    const userExist: IUser | null = await UserModel.findOne({ employee_code: req.params.emp_code })
+    if (!userExist) {
+        res.json({ msg: 'เกิดข้อผิดพลาด, ไม่พบผู้ใช้!' })
+        return
+    }
+    res.json(userExist)
+}
+
 const updateUser = async (req: Request, res: Response): Promise<void> => {
     UserModel.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }, (error, data) => {
         if (data) {
@@ -110,4 +119,30 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     })
 }
 
-export { getAllUsers, getOneUser, registerUser, loginUser, updateUser, deleteUser }
+type IPasswordReset = {
+    employee_code: number,
+    new_password: string,
+    confirm_password: string,
+}
+
+const resetUserPassword = async (req: Request, res: Response) => {
+    const { employee_code, new_password }: IPasswordReset = req.body
+    const user = await UserModel.findOne(({ employee_code }))
+
+    // Hash Password
+    let salt: string = bcrypt.genSaltSync(10)
+    let hashedPassword: string = bcrypt.hashSync(`${new_password}`, salt)
+
+    if (user) {
+        const updatedUser = await UserModel.findByIdAndUpdate(user?._id, { $set: { password: hashedPassword } })
+        if (updatedUser) {
+            res.json({
+                msg: 'เปลี่ยนรหัสผ่านสำเร็จ'
+            })
+            return
+        }
+        res.status(400).json({msg: 'เปลี่ยนรหัสผ่าน ไม่สำเร็จ!'})
+    }
+}
+
+export { getAllUsers, getOneUser, getUserByEmpCode, registerUser, loginUser, updateUser, deleteUser, resetUserPassword }

@@ -20,6 +20,8 @@ import FileUpload from "./components/Home/FileUpload";
 import JobDetail from "./components/Home/JobDetail";
 import MyJob from "./components/AdminJob/MyJob";
 import JobEdit from "./components/AdminJob/JobEdit";
+import ForgetPass from "./components/Login/ForgotPass";
+import Register from "./components/Register/Register";
 
 function App() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -83,7 +85,11 @@ function App() {
   }, [userToken]);
 
   if (!userToken) {
-    return <Login setuserToken={setuserToken} />;
+    return <Routes>
+      <Route index element={<Login setuserToken={setuserToken} />}/>
+      <Route path="/forgot-password" element={<ForgetPass />}/>
+      <Route path="/register" element={<Register />}/>
+    </Routes>
   }
 
   return (

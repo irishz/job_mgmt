@@ -1,0 +1,23 @@
+{
+  "name": "job_mgmt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irishz/job_mgmt.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/irishz/job_mgmt/issues"
+  },
+  "homepage": "https://github.com/irishz/job_mgmt#readme",
+  "dependencies": {
+    "concurrently": "^7.5.0"
+  }
+}
