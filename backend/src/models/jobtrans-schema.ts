@@ -13,7 +13,7 @@ const jobTransSchema = new Schema(
             type: mongoose.Schema.Types.ObjectId,
         },
         approved_at: {
-            type: Date
+        type: Date
         }
     },
     {

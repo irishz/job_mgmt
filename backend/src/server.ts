@@ -4,6 +4,7 @@ dotenv.config()
 import * as bodyParser from 'body-parser'
 import userRoute from './routes/user-routes'
 import jobRoute from './routes/job-routes'
+import jobTransRoute from './routes/jobtrans-routes'
 import programRoute from './routes/program-routes'
 import mongoose from 'mongoose'
 import cors, { CorsOptions } from 'cors'
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 
 app.use("/users", userRoute)
 app.use("/job", jobRoute)
+app.use("/jobtrans", jobTransRoute)
 app.use("/program", programRoute)
 
 app.listen(port, () => {

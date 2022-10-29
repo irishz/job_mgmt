@@ -51,6 +51,7 @@ import TJobHeading from "../../types/Job/job-heading-type";
 import JobContext from "../Context/JobContext";
 import { iUserAPI } from "../../types/user-types";
 import AuthContext from "../Context/AuthContext";
+import JobTrans from "../../types/JobTrans/jobtrans-types";
 
 function JobApprove() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -157,7 +158,6 @@ function JobApprove() {
           approved_by: authCtx?.userData?._id,
         })
         .then((res: AxiosResponse) => {
-          console.log(res.data);
           if (res.status === 200) {
             job_no = res.data?.queryRes?.job_no;
             jobCtx?.decreaseJobApproveCount();
@@ -174,6 +174,21 @@ function JobApprove() {
     }
 
     //TODO insert to job transaction table
+    const jobTransObj: JobTrans = {
+      job_id: jobId,
+      approved_by: authCtx?.userData?._id,
+      approved_at: moment().format(),
+    };
+    await axios
+      .post(`${API_URL}/jobtrans`, jobTransObj)
+      .then((res: AxiosResponse) => {
+        if (res.status === 200) {
+          insertJobTrans = true
+        }
+      })
+      .catch((error: AxiosError) => {
+        console.log("insert jobtrans error", error);
+      });
 
     console.log(changeStatusJob, insertJobTrans, job_no);
     if (changeStatusJob && insertJobTrans) {
