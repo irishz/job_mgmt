@@ -31,30 +31,40 @@ import {
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import IJob from "../../types/Job/job-types";
-import member from "./ComputerMember";
 import moment from "moment";
 import optStatusList from "../../util/jobStatusList";
+import { iUserAPI } from "../../types/user-types";
 
 function WeeklyReport() {
   const [jobList, setjobList] = useState<IJob[] | null>(null);
+  const [compMemberList, setcompMemberList] = useState<iUserAPI[] | null>(null);
   const [toggleNumber, settoggleNumber] = useState<boolean>(true);
   const API_URL = import.meta.env.VITE_API_URL;
   let successJob: number = 0,
     inprogressJob: number = 0,
-    totalJob: number = 0
+    totalJob: number = 0;
   useEffect(() => {
     axios.get(`${API_URL}/job`).then((res: AxiosResponse) => {
-      console.log(res.data);
       setjobList(res.data);
+    });
+
+    axios.get(`${API_URL}/users/comp-users`).then((res: AxiosResponse) => {
+      setcompMemberList(res.data);
     });
   }, []);
 
   if (jobList) {
     successJob = jobList.filter((job) => job.status === "User Training").length;
-    inprogressJob = jobList.filter(
-      ({status}) => optStatusList.filter(({name}) => name !== 'User Training').map(({name}) => name).includes(status)
+    inprogressJob = jobList.filter(({ status }) =>
+      optStatusList
+        .filter(({ name }) => name !== "User Training")
+        .map(({ name }) => name)
+        .includes(status)
     ).length;
-    totalJob = jobList.filter((job) => !['wait for approve', 'in progress', 'rejected'].includes(job.status)).length
+    totalJob = jobList.filter(
+      (job) =>
+        !["wait for approve", "in progress", "rejected"].includes(job.status)
+    ).length;
   }
 
   function renderJobByPerson(userId: string): number | undefined {
@@ -113,15 +123,15 @@ function WeeklyReport() {
               flexDirection="column"
               justifyContent="space-around"
             >
-              {member.map((member) => (
+              {compMemberList?.map((member) => (
                 <ListItem
-                  key={member.name_display}
+                  key={member.name}
                   display="flex"
                   justifyContent={"space-between"}
                   px={3}
                 >
-                  <Text>{member.name_display}</Text>
-                  <Text>{renderJobByPerson(member.id)}</Text>
+                  <Text>{member.name}</Text>
+                  <Text>{renderJobByPerson(member._id)}</Text>
                 </ListItem>
               ))}
             </List>
@@ -189,16 +199,16 @@ function WeeklyReport() {
           boxShadow={"0 2px 8px 0 rgba(0,0,0,0.18)"}
         >
           <Box>
-            <Tabs variant={'enclosed'}>
+            <Tabs variant={"enclosed"}>
               <TabList>
-                {member.map((member) => (
-                  <Tab key={member.id}>{member.name_display}</Tab>
+                {compMemberList?.map((member) => (
+                  <Tab key={member._id}>{member.name}</Tab>
                 ))}
               </TabList>
 
               <TabPanels overflowX={"auto"}>
-                {member.map((member) => (
-                  <TabPanel key={member.id}>
+                {compMemberList?.map((member) => (
+                  <TabPanel key={member._id}>
                     <TableContainer>
                       <Table variant={"striped"} size="sm" color={"gray.600"}>
                         <Thead fontWeight={"semibold"}>
@@ -214,10 +224,10 @@ function WeeklyReport() {
                         <Tbody>
                           {jobList
                             ?.filter((job) =>
-                              job.responsible_staff?._id?.includes(member.id)
+                              job.responsible_staff?._id?.includes(member._id)
                             )
                             .map((job) => (
-                              <Tr>
+                              <Tr key={job._id}>
                                 <Td>{job.job_no}</Td>
                                 <Td>{job.topic}</Td>
                                 <Td>{job.progress}</Td>

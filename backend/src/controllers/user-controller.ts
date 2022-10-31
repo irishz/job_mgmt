@@ -76,6 +76,15 @@ const getAllUsers = async (req: Request, res: Response): Promise<void> => {
     throw new Error('Error occured!')
 }
 
+const getComputerUsers = async (req: Request, res: Response) => {
+    const compUsers: IUser[] = await UserModel.find({ department: { $in: ['COMPUTER', 'Computer', 'computer'] } })
+    if (compUsers) {
+        res.status(200).json(compUsers)
+        return
+    }
+    res.status(400).json({ msg: 'ไม่พบข้อมูล' })
+}
+
 const getOneUser = async (req: Request, res: Response): Promise<void> => {
     const user = await UserModel.findById(req.params.id)
     if (user) {
@@ -141,8 +150,18 @@ const resetUserPassword = async (req: Request, res: Response) => {
             })
             return
         }
-        res.status(400).json({msg: 'เปลี่ยนรหัสผ่าน ไม่สำเร็จ!'})
+        res.status(400).json({ msg: 'เปลี่ยนรหัสผ่าน ไม่สำเร็จ!' })
     }
 }
 
-export { getAllUsers, getOneUser, getUserByEmpCode, registerUser, loginUser, updateUser, deleteUser, resetUserPassword }
+export {
+    getAllUsers,
+    getComputerUsers,
+    getOneUser,
+    getUserByEmpCode,
+    registerUser,
+    loginUser,
+    updateUser,
+    deleteUser,
+    resetUserPassword
+}
