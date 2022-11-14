@@ -337,7 +337,7 @@ function JobApprove() {
               gap={2}
             >
               {userList
-                .filter((user) => user.department === "COMPUTER")
+                .filter((user) => user.department.toUpperCase() === "COMPUTER")
                 .map((user) => (
                   <Button
                     key={user._id as Key}
