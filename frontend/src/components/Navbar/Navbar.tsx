@@ -10,16 +10,18 @@ import {
 import React, { Key, useContext } from "react";
 import NavbarMenuList from "./NavbarData";
 import AuthContext from "../Context/AuthContext";
-import { Link, To } from "react-router-dom";
+import { Link, To, useNavigate } from "react-router-dom";
 import { MdSettings } from "react-icons/md";
 import { BiLogOut } from "react-icons/bi";
 
 function Navbar() {
   const authCtx = useContext(AuthContext);
+  const navigate = useNavigate();
 
   function handleLogout() {
     localStorage.removeItem("token");
     authCtx?.setuserToken("");
+    navigate("/", { replace: true });
   }
   // console.log(authCtx.userData)
   return (
