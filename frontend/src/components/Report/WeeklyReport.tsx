@@ -4,11 +4,11 @@ import {
   Button,
   CircularProgress,
   CircularProgressLabel,
-  Flex,
   Grid,
   GridItem,
   List,
   ListItem,
+  Select,
   Stack,
   Stat,
   StatLabel,
@@ -29,7 +29,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import axios, { AxiosResponse } from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import IJob from "../../types/Job/job-types";
 import moment from "moment";
 import optStatusList from "../../util/jobStatusList";
@@ -46,8 +46,16 @@ function WeeklyReport() {
   const [toggleNumber, settoggleNumber] = useState<boolean>(true);
   const [toggleButton, settoggleButton] = useState<boolean>(false);
   const [allJobsButton, setallJobsButton] = useState<boolean>(false);
+  const [filterStatus, setfilterStatus] = useState<string[]>([
+    "User Training",
+    "Scope Program Process",
+    "Diagram Process",
+    "Coding Process",
+    "Testing Process",
+  ]);
   const [startDate, setstartDate] = useState<Date | undefined>(new Date());
   const [endDate, setendDate] = useState<Date | undefined>(new Date());
+  const selectInputRef = useRef<HTMLSelectElement>(null);
 
   const API_URL = import.meta.env.VITE_API_URL;
   let successJob: number = 0,
@@ -80,10 +88,10 @@ function WeeklyReport() {
           )}&enddate=${moment(endDate).format("YYYY-MM-DD")}`
         )
         .then((res: AxiosResponse) => {
-            setjobList(res.data);
+          setjobList(res.data);
         });
     }
-    setallJobsButton(false)
+    setallJobsButton(false);
   }, [toggleButton]);
 
   if (jobList) {
@@ -118,6 +126,38 @@ function WeeklyReport() {
   function handleSelectRange(ranges: RangeKeyDict) {
     setstartDate(ranges.selection.startDate);
     setendDate(ranges.selection.endDate);
+    setfilterStatus([]);
+  }
+
+  function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    let status: string = e.target.value;
+    switch (status) {
+      case "all":
+        setfilterStatus([
+          "User Training",
+          "Scope Program Process",
+          "Diagram Process",
+          "Coding Process",
+          "Testing Process",
+        ]);
+        break;
+
+      case "success":
+        setfilterStatus(["User Training"]);
+        break;
+
+      case "in-progress":
+        setfilterStatus([
+          "Scope Program Process",
+          "Diagram Process",
+          "Coding Process",
+          "Testing Process",
+        ]);
+        break;
+
+      default:
+        break;
+    }
   }
 
   return (
@@ -248,7 +288,7 @@ function WeeklyReport() {
                     <Tab key={member._id}>{member.name}</Tab>
                   ))}
                 </Box>
-                <Box position={"absolute"} right={0} boxShadow={2}>
+                <Box position={"absolute"} right={0} boxShadow={2} w="auto">
                   <Box
                     display={"flex"}
                     justifyContent={"end"}
@@ -256,6 +296,19 @@ function WeeklyReport() {
                     alignItems="center"
                     gap={2}
                   >
+                    <Select
+                      ref={selectInputRef}
+                      w={"auto"}
+                      variant="outline"
+                      textUnderlineOffset={0}
+                      onChange={(e) => handleStatusChange(e)}
+                      p={0}
+                      fontSize={14}
+                    >
+                      <option value="all">ทั้งหมด</option>
+                      <option value="success">Success</option>
+                      <option value="in-progress">In Progress</option>
+                    </Select>
                     {selectionRange ? (
                       <Text
                         fontSize={12}
@@ -263,8 +316,10 @@ function WeeklyReport() {
                         boxShadow={"0 2px 4px 0 rgba(0,0,0,0.18)"}
                         py={1}
                         px={2}
+                        w={40}
                         rounded={"md"}
                         fontWeight="semibold"
+                        textAlign={"center"}
                       >
                         {moment(startDate).format("DD/MM/YYYY")} -{" "}
                         {moment(endDate).format("DD/MM/YYYY")}
@@ -280,7 +335,14 @@ function WeeklyReport() {
                     >
                       เลือกวันที่
                     </Button>
-                    <Button variant={'outline'} colorScheme='purple' onClick={() => setallJobsButton(true)}>
+                    <Button
+                      variant={"outline"}
+                      colorScheme="purple"
+                      onClick={() => {
+                        settoggleButton(false);
+                        setallJobsButton(true);
+                      }}
+                    >
                       ดูทั้งหมด
                     </Button>
                   </Box>
@@ -316,13 +378,17 @@ function WeeklyReport() {
                             <Th>Progress (%)</Th>
                             <Th>Date Finish (Actual)</Th>
                             <Th>Date Finish (Estimate)</Th>
+                            <Th>Create date</Th>
                             <Th>Delay Reason</Th>
                           </Tr>
                         </Thead>
                         <Tbody>
                           {jobList
-                            ?.filter((job) =>
-                              job.responsible_staff?._id?.includes(member._id)
+                            ?.filter(
+                              (job) =>
+                                job.responsible_staff?._id?.includes(
+                                  member._id
+                                ) && filterStatus?.includes(job.status)
                             )
                             .map((job) => (
                               <Tr key={job._id}>
@@ -338,6 +404,9 @@ function WeeklyReport() {
                                   {moment(job.est_finish_date).format(
                                     "DD/MM/YYYY"
                                   )}
+                                </Td>
+                                <Td>
+                                  {moment(job.createdAt).format("DD/MM/YYYY")}
                                 </Td>
                                 <Td>{job.delay_reason}</Td>
                               </Tr>
