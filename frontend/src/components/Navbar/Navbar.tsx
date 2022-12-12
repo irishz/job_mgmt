@@ -19,9 +19,10 @@ function Navbar() {
   const navigate = useNavigate();
 
   function handleLogout() {
+    console.log('navigate to home')
+    navigate("/", { replace: true });
     localStorage.removeItem("token");
     authCtx?.setuserToken("");
-    navigate("/", { replace: true });
   }
   // console.log(authCtx.userData)
   return (

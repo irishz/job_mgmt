@@ -1,7 +1,7 @@
 import "@fontsource/sarabun";
 import {
-  Badge,
   Box,
+  Button,
   CircularProgress,
   CircularProgressLabel,
   Flex,
@@ -29,20 +29,37 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import axios, { AxiosResponse } from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import IJob from "../../types/Job/job-types";
 import moment from "moment";
 import optStatusList from "../../util/jobStatusList";
 import { iUserAPI } from "../../types/user-types";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
+import { DateRangePicker, Range, RangeKeyDict } from "react-date-range";
+import { th } from "date-fns/locale";
+import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 
 function WeeklyReport() {
   const [jobList, setjobList] = useState<IJob[] | null>(null);
   const [compMemberList, setcompMemberList] = useState<iUserAPI[] | null>(null);
   const [toggleNumber, settoggleNumber] = useState<boolean>(true);
+  const [toggleButton, settoggleButton] = useState<boolean>(false);
+  const [allJobsButton, setallJobsButton] = useState<boolean>(false);
+  const [startDate, setstartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setendDate] = useState<Date | undefined>(new Date());
+
   const API_URL = import.meta.env.VITE_API_URL;
   let successJob: number = 0,
     inprogressJob: number = 0,
     totalJob: number = 0;
+
+  const selectionRange: Range = {
+    startDate,
+    endDate,
+    key: "selection",
+  };
+
   useEffect(() => {
     axios.get(`${API_URL}/job`).then((res: AxiosResponse) => {
       setjobList(res.data);
@@ -51,7 +68,23 @@ function WeeklyReport() {
     axios.get(`${API_URL}/users/comp-users`).then((res: AxiosResponse) => {
       setcompMemberList(res.data);
     });
-  }, []);
+  }, [allJobsButton]);
+
+  useEffect(() => {
+    if (toggleButton === false) {
+      // fetch job list data by date range
+      axios
+        .get(
+          `${API_URL}/job/date-range?startdate=${moment(startDate).format(
+            "YYYY-MM-DD"
+          )}&enddate=${moment(endDate).format("YYYY-MM-DD")}`
+        )
+        .then((res: AxiosResponse) => {
+            setjobList(res.data);
+        });
+    }
+    setallJobsButton(false)
+  }, [toggleButton]);
 
   if (jobList) {
     successJob = jobList.filter((job) => job.status === "User Training").length;
@@ -76,6 +109,15 @@ function WeeklyReport() {
     }
 
     return jobCountByPerson;
+  }
+
+  function handleBtnDateRangeClick() {
+    settoggleButton(!toggleButton);
+  }
+
+  function handleSelectRange(ranges: RangeKeyDict) {
+    setstartDate(ranges.selection.startDate);
+    setendDate(ranges.selection.endDate);
   }
 
   return (
@@ -200,10 +242,66 @@ function WeeklyReport() {
         >
           <Box>
             <Tabs variant={"enclosed"}>
-              <TabList>
-                {compMemberList?.map((member) => (
-                  <Tab key={member._id}>{member.name}</Tab>
-                ))}
+              <TabList justifyContent={"space-between"} position="relative">
+                <Box display={"flex"}>
+                  {compMemberList?.map((member) => (
+                    <Tab key={member._id}>{member.name}</Tab>
+                  ))}
+                </Box>
+                <Box position={"absolute"} right={0} boxShadow={2}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"end"}
+                    mb={1}
+                    alignItems="center"
+                    gap={2}
+                  >
+                    {selectionRange ? (
+                      <Text
+                        fontSize={12}
+                        color="gray.600"
+                        boxShadow={"0 2px 4px 0 rgba(0,0,0,0.18)"}
+                        py={1}
+                        px={2}
+                        rounded={"md"}
+                        fontWeight="semibold"
+                      >
+                        {moment(startDate).format("DD/MM/YYYY")} -{" "}
+                        {moment(endDate).format("DD/MM/YYYY")}
+                      </Text>
+                    ) : null}
+                    <Button
+                      variant={"outline"}
+                      colorScheme="blue"
+                      leftIcon={
+                        toggleButton ? <ArrowUpIcon /> : <ArrowDownIcon />
+                      }
+                      onClick={handleBtnDateRangeClick}
+                    >
+                      เลือกวันที่
+                    </Button>
+                    <Button variant={'outline'} colorScheme='purple' onClick={() => setallJobsButton(true)}>
+                      ดูทั้งหมด
+                    </Button>
+                  </Box>
+                  {toggleButton === false ? null : (
+                    <Stack>
+                      <DateRangePicker
+                        ranges={[selectionRange]}
+                        locale={th}
+                        onChange={handleSelectRange}
+                      />
+                      <Button
+                        size={"sm"}
+                        variant="solid"
+                        colorScheme={"blue"}
+                        onClick={() => settoggleButton(false)}
+                      >
+                        ตกลง
+                      </Button>
+                    </Stack>
+                  )}
+                </Box>
               </TabList>
 
               <TabPanels overflowX={"auto"}>

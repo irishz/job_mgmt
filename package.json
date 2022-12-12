@@ -20,5 +20,8 @@
   "homepage": "https://github.com/irishz/job_mgmt#readme",
   "dependencies": {
     "concurrently": "^7.5.0"
+  },
+  "devDependencies": {
+    "@types/react-date-range": "^1.4.4"
   }
 }

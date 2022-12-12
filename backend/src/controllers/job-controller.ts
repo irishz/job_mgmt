@@ -1,6 +1,7 @@
 import { JobModel } from './../models/job-schema';
 import { IJob } from './../types/job-types';
 import { NextFunction, Request, Response } from "express";
+import { Date } from 'mongoose';
 
 const createJob = async (req: Request, res: Response) => {
     const { topic, job_detail_1, job_detail_2, staff_req, department_req, ref_loss_cost_reduction, share_cost, status, job_type }: IJob = req.body
@@ -41,6 +42,22 @@ const getAllJob = async (req: Request, res: Response) => {
         return
     }
     console.log("Error occured, Cannot get job!");
+}
+
+const getJobByDateRange = async (req: Request, res: Response) => {
+    const { startdate, enddate } = req.query
+
+    const queryRes: IJob[] | null = await JobModel.find({
+        createdAt: {
+            $gte: startdate,
+            $lt: enddate
+        }
+    }).populate(["responsible_staff", "staff_req", "approved_by"])
+
+    if (queryRes) {
+        res.status(200).json(queryRes)
+        return
+    }
 }
 
 const getOneJobById = async (req: Request, res: Response) => {
@@ -126,4 +143,5 @@ export {
     updateJobById,
     deleteJobById,
     getJobByUserId,
+    getJobByDateRange,
 }
