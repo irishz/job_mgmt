@@ -66,7 +66,7 @@ function JobCreate() {
       ref_loss_cost_reduction: "",
       share_cost: 0,
       status: "",
-      job_type: "Project",
+      job_type: "",
       attachments: undefined,
     },
   });
@@ -259,61 +259,6 @@ function JobCreate() {
                   <FormControl>
                     <FormLabel>รายละเอียด 2</FormLabel>
                     <Textarea {...register("job_detail_2")} />
-                  </FormControl>
-                </GridItem>
-                {/* Ref Loss and Cost Reduction */}
-                <GridItem colSpan={4}>
-                  <FormControl
-                    isInvalid={errors.ref_loss_cost_reduction ? true : false}
-                  >
-                    <FormLabel>Ref loss no. & Cost reduction</FormLabel>
-                    <Input
-                      {...register("ref_loss_cost_reduction", {})}
-                      type="text"
-                      placeholder="xxx/xxxx-xxxxxxx"
-                    />
-                    <FormHelperText color={"red"}>
-                      {errors.ref_loss_cost_reduction?.message}
-                    </FormHelperText>
-                  </FormControl>
-                </GridItem>
-                {/* Share Cost */}
-                <GridItem colSpan={4}>
-                  <FormControl isInvalid={errors.share_cost ? true : false}>
-                    <FormLabel>Share Cost</FormLabel>
-                    <InputGroup>
-                      <Input
-                        {...register("share_cost", {
-                          min: 0,
-                        })}
-                        type="number"
-                      />
-                      <InputRightAddon children="฿" fontWeight={"semibold"} />
-                    </InputGroup>
-                    <FormHelperText color={"red"}>
-                      {errors.share_cost?.message}
-                    </FormHelperText>
-                  </FormControl>
-                </GridItem>
-                {/* Select program type */}
-                <GridItem colSpan={4}>
-                  <FormControl
-                    isRequired
-                    isInvalid={errors.job_type ? true : false}
-                  >
-                    <FormLabel>ประเภท</FormLabel>
-                    <Select
-                      {...register("job_type", {
-                        required: "กรุณาเลือกประเภท",
-                      })}
-                    >
-                      {programList?.map((item) => (
-                        <option key={item.type}>{item.type}</option>
-                      ))}
-                    </Select>
-                    <FormHelperText color={"red"}>
-                      {errors.job_type?.message}
-                    </FormHelperText>
                   </FormControl>
                 </GridItem>
                 {/* File Upload */}

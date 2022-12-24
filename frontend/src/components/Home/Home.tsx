@@ -95,7 +95,6 @@ function Home() {
                 <Th textAlign={'center'}>แผนก</Th>
                 <Th textAlign={'center'}>สถานะ</Th>
                 <Th textAlign={'center'}>สร้างเมื่อ</Th>
-                <Th></Th>
               </Tr>
             </Thead>
             <Tbody whiteSpace={'pre-wrap'}>
@@ -133,51 +132,6 @@ function Home() {
                   <Td>{job.department_req}</Td>
                   <Td>{job.status}</Td>
                   <Td>{moment(job.createdAt).format("DD/MM/YYYY HH:mm A")}</Td>
-                  <Td display="inline-flex">
-                    <EditIcon
-                      w={4}
-                      h={4}
-                      color="facebook"
-                      _hover={{ color: "facebook.300" }}
-                      mx={2}
-                      // onClick={() => handleEditDeleteClick(data.id, "edit")}
-                    />
-                    <DeleteIcon
-                      w={4}
-                      h={4}
-                      color="red"
-                      _hover={{ color: "red.300" }}
-                      onClick={onOpen}
-                    />
-                    <Modal isOpen={isOpen} onClose={onClose}>
-                      <ModalOverlay bgColor={"blackAlpha.200"} />
-                      <ModalContent>
-                        <ModalHeader>ยืนยันการลบ Job</ModalHeader>
-                        <ModalCloseButton />
-                        <ModalBody>
-                          <Text>
-                            Job No : <strong>{job.job_no}</strong>
-                          </Text>
-                          <Text>
-                            Topic : <strong>{job.topic}</strong>
-                          </Text>
-                        </ModalBody>
-                        <ModalFooter display={"flex"} gap={3}>
-                          <Button
-                            variant={"solid"}
-                            colorScheme="red"
-                            leftIcon={<DeleteIcon />}
-                            onClick={() => processDeleteJob(job._id)}
-                          >
-                            ลบ
-                          </Button>
-                          <Button variant={"outline"} onClick={onClose}>
-                            ยกเลิก
-                          </Button>
-                        </ModalFooter>
-                      </ModalContent>
-                    </Modal>
-                  </Td>
                 </Tr>
               ))}
             </Tbody>
