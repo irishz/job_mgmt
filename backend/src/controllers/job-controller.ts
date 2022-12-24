@@ -1,7 +1,6 @@
 import { JobModel } from './../models/job-schema';
 import { IJob } from './../types/job-types';
 import { NextFunction, Request, Response } from "express";
-import { Date } from 'mongoose';
 
 const createJob = async (req: Request, res: Response) => {
     const { topic, job_detail_1, job_detail_2, staff_req, department_req, ref_loss_cost_reduction, share_cost, status, job_type }: IJob = req.body
@@ -83,7 +82,7 @@ const getJobResponseBy = async (req: Request, res: Response) => {
 const getJobWaitApprove = async (req: Request, res: Response, next: NextFunction) => {
     const status: String = "wait for approve"
     try {
-        const queryRes: IJob[] | null = await JobModel.find({ status })
+        const queryRes: IJob[] | null = await JobModel.find({ status }).populate('staff_req')
 
         if (queryRes) {
             res.json(queryRes)
