@@ -1,5 +1,6 @@
 import "@fontsource/sarabun";
 import {
+  Badge,
   Box,
   Button,
   CircularProgress,
@@ -285,7 +286,16 @@ function WeeklyReport() {
               <TabList justifyContent={"space-between"} position="relative">
                 <Box display={"flex"}>
                   {compMemberList?.map((member) => (
-                    <Tab key={member._id}>{member.name}</Tab>
+                    <Tab key={member._id}>
+                      {member.name}{" "}
+                      <Badge mx={1} bgColor='blue.500' color={'white'} transitionDelay='1000ms'>
+                        {jobList?.filter(
+                          (job) =>
+                            job.responsible_staff?._id?.includes(member._id) &&
+                            filterStatus?.includes(job.status)
+                        ).length || null}
+                      </Badge>
+                    </Tab>
                   ))}
                 </Box>
                 <Box position={"absolute"} right={0} boxShadow={2} w="auto">
@@ -366,19 +376,19 @@ function WeeklyReport() {
                 </Box>
               </TabList>
 
-              <TabPanels overflowX={"auto"}>
+              <TabPanels>
                 {compMemberList?.map((member) => (
                   <TabPanel key={member._id}>
-                    <TableContainer>
+                    <TableContainer overflowY={"auto"} h="350">
                       <Table variant={"striped"} size="sm" color={"gray.600"}>
                         <Thead fontWeight={"semibold"}>
                           <Tr>
                             <Th>Job No.</Th>
                             <Th>Topic</Th>
                             <Th>Progress (%)</Th>
+                            <Th>Create date</Th>
                             <Th>Date Finish (Actual)</Th>
                             <Th>Date Finish (Estimate)</Th>
-                            <Th>Create date</Th>
                             <Th>Delay Reason</Th>
                           </Tr>
                         </Thead>
@@ -390,11 +400,19 @@ function WeeklyReport() {
                                   member._id
                                 ) && filterStatus?.includes(job.status)
                             )
+                            .sort(
+                              (a, b) =>
+                                new Date(b.est_finish_date).getTime() -
+                                new Date(a.est_finish_date).getTime()
+                            )
                             .map((job) => (
                               <Tr key={job._id}>
                                 <Td>{job.job_no}</Td>
                                 <Td>{job.topic}</Td>
                                 <Td>{job.progress}</Td>
+                                <Td>
+                                  {moment(job.createdAt).format("DD/MM/YYYY")}
+                                </Td>
                                 <Td>
                                   {moment(job.act_finish_date).format(
                                     "DD/MM/YYYY"
@@ -404,9 +422,6 @@ function WeeklyReport() {
                                   {moment(job.est_finish_date).format(
                                     "DD/MM/YYYY"
                                   )}
-                                </Td>
-                                <Td>
-                                  {moment(job.createdAt).format("DD/MM/YYYY")}
                                 </Td>
                                 <Td>{job.delay_reason}</Td>
                               </Tr>

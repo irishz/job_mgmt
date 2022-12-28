@@ -1,53 +1,26 @@
 import { EditIcon } from "@chakra-ui/icons";
 import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
   Box,
   Button,
   Divider,
   Flex,
-  FormControl,
-  FormHelperText,
-  FormLabel,
   Heading,
   Highlight,
-  Input,
-  InputGroup,
-  InputRightAddon,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Select,
   SimpleGrid,
-  Stack,
   Text,
-  Textarea,
-  useDisclosure,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
-import axios, { Axios, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import moment from "moment";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import IJob from "../../types/Job/job-types";
-import currency from "../../util/Currency";
 import AuthContext from "../Context/AuthContext";
-import jobStatusList from "../../util/jobStatusList";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import optStatusList from "../../util/jobStatusList";
 
 function MyJob() {
   const API_URL = import.meta.env.VITE_API_URL;
   const [jobList, setjobList] = useState<IJob[] | undefined>(undefined);
-  const [selectedJob, setselectedJob] = useState<IJob | null>(null);
   const authCtx = useContext(AuthContext);
   const navigate = useNavigate();
 

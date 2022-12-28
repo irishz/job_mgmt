@@ -10,7 +10,7 @@ import mongoose from 'mongoose'
 import cors, { CorsOptions } from 'cors'
 import DBConnection from './db'
 
-const { port, DB_URI } = process.env
+const { port, DB_URI, NODE_ENV } = process.env
 
 mongoose.Promise = global.Promise
 // mongoose.connect(`${db_uri}`)
@@ -32,7 +32,11 @@ const options: CorsOptions = {
 }
 
 const app = express()
-// app.use(cors())
+
+// Check mode to enable cors
+if (NODE_ENV === 'development') {
+    app.use(cors())
+}
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({

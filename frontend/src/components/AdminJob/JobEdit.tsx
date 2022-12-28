@@ -14,25 +14,23 @@ import {
   InputGroup,
   InputRightAddon,
   Select,
-  Stack,
   Text,
   Textarea,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BiLeftArrow } from "react-icons/bi";
-import { BsArrowLeft, BsSave } from "react-icons/bs";
 import { FaSave } from "react-icons/fa";
-import { Form, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import IJob from "../../types/Job/job-types";
+import IProgram from "../../types/Program/ProgramTypes";
 import currency from "../../util/Currency";
 import optStatusList from "../../util/jobStatusList";
 
 function JobEdit() {
-    const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = import.meta.env.VITE_API_URL;
   const location = useLocation();
   const {
     _id,
@@ -53,9 +51,11 @@ function JobEdit() {
     status,
     delay_reason,
     progress,
+    job_type,
   }: IJob = location.state;
   const navigate = useNavigate();
   const [isBtnLoading, setisBtnLoading] = useState<boolean>(false);
+  const [programList, setprogramList] = useState<IProgram[]>([]);
   const {
     register,
     handleSubmit,
@@ -67,42 +67,56 @@ function JobEdit() {
       customize_cost: customize_cost || 0,
       status: status || "",
       delay_reason: delay_reason || "",
-      act_finish_date: moment(act_finish_date).format("YYYY-MM-DD").toString() || "",
-      est_finish_date: moment(est_finish_date).format("YYYY-MM-DD").toString() || "",
+      act_finish_date:
+        moment(act_finish_date).format("YYYY-MM-DD").toString() || "",
+      est_finish_date:
+        moment(est_finish_date).format("YYYY-MM-DD").toString() || "",
+      job_type: job_type,
     },
   });
-  const toast = useToast()
+  const toast = useToast();
 
   type FormInput = {
-    est_finish_date: string,
-    act_finish_date: string,
-    control_by: string,
-    customize_cost: number,
-    status: string,
-    progress?: number,
-    delay_reason: string
+    est_finish_date: string;
+    act_finish_date: string;
+    control_by: string;
+    customize_cost: number;
+    status: string;
+    progress?: number;
+    delay_reason: string;
+    job_type: string;
   };
 
-  function calProgress(status: string):number {
-      return optStatusList.filter(({name}) => name === status)[0].percent
+  useEffect(() => {
+    axios.get(`${API_URL}/program`).then((res: AxiosResponse) => {
+      setprogramList(res.data);
+    });
+
+    return () => {
+      setprogramList([]);
+    };
+  }, []);
+
+  function calProgress(status: string): number {
+    return optStatusList.filter(({ name }) => name === status)[0].percent;
   }
 
   const onSubmit: SubmitHandler<FormInput> = (data) => {
-      const jobProgress = calProgress(data.status)
-    const formData = Object.assign({progress: jobProgress} ,data)
+    const jobProgress = calProgress(data.status);
+    const formData = Object.assign({ progress: jobProgress }, data);
     console.log(formData);
-    setisBtnLoading(true)
+    setisBtnLoading(true);
     axios.put(`${API_URL}/job/${_id}`, formData).then((res) => {
-        setisBtnLoading(false)
-        toast({
-            title: res.data.msg,
-            description: 'กำลังกลับไปยังหน้าก่อนหน้า...',
-            position: 'bottom-right',
-            status: 'success',
-            duration: 3000,
-            onCloseComplete: () => navigate(-1),
-        })
-    })
+      setisBtnLoading(false);
+      toast({
+        title: res.data.msg,
+        description: "กำลังกลับไปยังหน้าก่อนหน้า...",
+        position: "bottom-right",
+        status: "success",
+        duration: 3000,
+        onCloseComplete: () => navigate(-1),
+      });
+    });
   };
 
   return (
@@ -214,10 +228,10 @@ function JobEdit() {
           <GridItem colSpan={12}>
             <Flex align="center">
               <Divider />
-              <Text px="2" whiteSpace={"nowrap"}>
+              <Text px="2" whiteSpace={"nowrap"} fontWeight="bold">
                 Input Form
               </Text>
-              <Divider />
+              <Divider my={5} />
             </Flex>
           </GridItem>
 
@@ -225,17 +239,43 @@ function JobEdit() {
           <GridItem colSpan={3}>
             <FormControl isRequired>
               <FormLabel>Estimate Finish Date</FormLabel>
-              <Input type={'date'} {...register("est_finish_date", {required: 'Please select estimate finish date!'})}/>
+              <Input
+                type={"date"}
+                {...register("est_finish_date", {
+                  required: "Please select estimate finish date!",
+                })}
+              />
             </FormControl>
           </GridItem>
-          <GridItem colStart={5} colEnd={8}>
+          <GridItem colSpan={3}>
             <FormControl>
               <FormLabel>Actual Finish Date</FormLabel>
-              <Input type={'date'} {...register("act_finish_date")} defaultValue=""/>
+              <Input
+                type={"date"}
+                {...register("act_finish_date")}
+                defaultValue=""
+              />
             </FormControl>
           </GridItem>
-          <GridItem colSpan={4}>
+          <GridItem colStart={7} colEnd={10}>
+            <FormControl>
+              <FormLabel>Job Type</FormLabel>
+              <Select
+                {...register("job_type", { required: "กรุณาเลือกประเภท" })}
+                placeholder={job_type || "Please select type!"}
+              >
+                {programList.length > 0
+                  ? programList.map(({ type }) => (
+                      <option value={type}>{type}</option>
+                    ))
+                  : null}
+              </Select>
+              <FormHelperText color={"red"}>
+                {errors.job_type?.message}
+              </FormHelperText>
+            </FormControl>
           </GridItem>
+          <GridItem colSpan={2} />
           <GridItem colSpan={2}>
             <FormControl>
               <FormLabel>Job Control By</FormLabel>

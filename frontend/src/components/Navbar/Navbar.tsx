@@ -7,7 +7,7 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react";
-import React, { Key, useContext } from "react";
+import { Key, useContext } from "react";
 import NavbarMenuList from "./NavbarData";
 import AuthContext from "../Context/AuthContext";
 import { Link, To, useNavigate } from "react-router-dom";

@@ -1,27 +1,19 @@
 import {
-  Avatar,
   Badge,
   Box,
   Button,
-  Circle,
   Collapse,
-  Divider,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Input,
-  List,
-  ListItem,
   Stack,
   Text,
   Tooltip,
   useBoolean,
 } from "@chakra-ui/react";
-import React, { Key, useContext, useEffect, useState } from "react";
+import { Key, useContext, useEffect, useState } from "react";
 import AuthContext from "../Context/AuthContext";
 import { BiLogOut } from "react-icons/bi";
-import { Link, To, useLocation } from "react-router-dom";
+import { Link, To, useLocation, useNavigate } from "react-router-dom";
 import NavbarMenuList from "./NavbarData";
 import JobContext from "../Context/JobContext";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
@@ -32,8 +24,10 @@ function AdminNav() {
   const [jobCount, setjobCount] = useState(jobCtx?.jobApproveCount);
   const location = useLocation();
   const [show, setshow] = useBoolean(false);
+  const navigate = useNavigate();
 
   function handleLogout() {
+    navigate("/", { replace: true });
     localStorage.removeItem("token");
     authCtx?.setuserToken("");
   }
@@ -58,7 +52,7 @@ function AdminNav() {
         <Heading
           bgGradient="linear(to-r, #6274e7, #8752a3)"
           bgClip={"text"}
-          fontSize={['x-small','small', 'md', 'xl']}
+          fontSize={["x-small", "small", "md", "xl"]}
           my={3}
           px={2}
         >
@@ -77,38 +71,38 @@ function AdminNav() {
                 mb={0}
               >
                 <Tooltip label={menu.name} hasArrow>
-                <Flex
-                  p={3}
-                  key={menu?.name as Key}
-                  w="full"
-                  justifyContent={"space-between"}
-                  _hover={{
-                    bgColor: "whiteAlpha.300",
-                  }}
-                  bgColor={
-                    location.pathname.includes("report")
-                      ? "whiteAlpha.600"
-                      : undefined
-                  }
-                  borderRadius={5}
-                  alignItems={"center"}
-                  color="white"
-                >
-                  <Text display={"flex"} alignItems={"center"} gap={2}>
-                    {menu.icon}
-                    {menu.name_th}
-                    {menu.name === "waiting approve" ? (
-                      <Badge bgColor="tomato" color="white">
-                        {jobCount}
-                      </Badge>
-                    ) : null}
-                  </Text>
-                  {show ? (
-                    <ChevronUpIcon />
-                  ) : (
-                    <ChevronDownIcon transition={"all 2s linear"} />
-                  )}
-                </Flex>
+                  <Flex
+                    p={3}
+                    key={menu?.name as Key}
+                    w="full"
+                    justifyContent={"space-between"}
+                    _hover={{
+                      bgColor: "whiteAlpha.300",
+                    }}
+                    bgColor={
+                      location.pathname.includes("report")
+                        ? "whiteAlpha.600"
+                        : undefined
+                    }
+                    borderRadius={5}
+                    alignItems={"center"}
+                    color="white"
+                  >
+                    <Text display={"flex"} alignItems={"center"} gap={2}>
+                      {menu.icon}
+                      {menu.name_th}
+                      {menu.name === "waiting approve" ? (
+                        <Badge bgColor="tomato" color="white">
+                          {jobCount}
+                        </Badge>
+                      ) : null}
+                    </Text>
+                    {show ? (
+                      <ChevronUpIcon />
+                    ) : (
+                      <ChevronDownIcon transition={"all 2s linear"} />
+                    )}
+                  </Flex>
                 </Tooltip>
                 <Collapse in={show}>
                   {menu?.sub_menu?.map((item) => (
