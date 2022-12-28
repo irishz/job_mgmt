@@ -402,8 +402,8 @@ function WeeklyReport() {
                             )
                             .sort(
                               (a, b) =>
-                                new Date(b.est_finish_date).getTime() -
-                                new Date(a.est_finish_date).getTime()
+                              new Date(a.est_finish_date).getTime() -
+                              new Date(b.est_finish_date).getTime()
                             )
                             .map((job) => (
                               <Tr key={job._id}>
