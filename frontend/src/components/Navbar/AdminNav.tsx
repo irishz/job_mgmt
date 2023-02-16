@@ -40,7 +40,7 @@ function AdminNav() {
     <Flex
       left={0}
       top={0}
-      w={"15%"}
+      w={{ base: "15%", sm: "10%", md: "15%", lg: "15%" }}
       flexDirection={"column"}
       justifyContent={"space-between"}
       h="100vh"
@@ -55,6 +55,7 @@ function AdminNav() {
           fontSize={["x-small", "small", "md", "xl"]}
           my={3}
           px={2}
+          display={{ base: "none", sm: "none", md: "block", lg: "block" }}
         >
           Job Management
         </Heading>

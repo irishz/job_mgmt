@@ -40,13 +40,14 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRangePicker, Range, RangeKeyDict } from "react-date-range";
 import { th } from "date-fns/locale";
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
+import "moment/dist/locale/th";
 
 function WeeklyReport() {
   const [jobList, setjobList] = useState<IJob[] | null>(null);
   const [compMemberList, setcompMemberList] = useState<iUserAPI[] | null>(null);
   const [toggleNumber, settoggleNumber] = useState<boolean>(true);
   const [toggleButton, settoggleButton] = useState<boolean>(false);
-  const [allJobsButton, setallJobsButton] = useState<boolean>(false);
+  const [allJobsButton, setallJobsButton] = useState<boolean>(true);
   const [filterStatus, setfilterStatus] = useState<string[]>([
     "User Training",
     "Scope Program Process",
@@ -70,16 +71,6 @@ function WeeklyReport() {
   };
 
   useEffect(() => {
-    axios.get(`${API_URL}/job`).then((res: AxiosResponse) => {
-      setjobList(res.data);
-    });
-
-    axios.get(`${API_URL}/users/comp-users`).then((res: AxiosResponse) => {
-      setcompMemberList(res.data);
-    });
-  }, [allJobsButton]);
-
-  useEffect(() => {
     if (toggleButton === false) {
       // fetch job list data by date range
       axios
@@ -94,6 +85,16 @@ function WeeklyReport() {
     }
     setallJobsButton(false);
   }, [toggleButton]);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/job`).then((res: AxiosResponse) => {
+      setjobList(res.data);
+    });
+
+    axios.get(`${API_URL}/users/comp-users`).then((res: AxiosResponse) => {
+      setcompMemberList(res.data);
+    });
+  }, [allJobsButton]);
 
   if (jobList) {
     successJob = jobList.filter((job) => job.status === "User Training").length;
@@ -240,7 +241,9 @@ function WeeklyReport() {
               <CircularProgressLabel fontSize={40}>
                 {toggleNumber
                   ? successJob
-                  : `${((successJob / totalJob) * 100).toFixed(0)}%`}
+                  : successJob
+                  ? `${((successJob / totalJob) * 100).toFixed(0)}%`
+                  : "0%"}
               </CircularProgressLabel>
             </CircularProgress>
             <Text>Success</Text>
@@ -265,7 +268,9 @@ function WeeklyReport() {
               <CircularProgressLabel fontSize={40}>
                 {toggleNumber
                   ? inprogressJob
-                  : `${((inprogressJob / totalJob) * 100).toFixed(0)}%`}
+                  : inprogressJob
+                  ? `${((inprogressJob / totalJob) * 100).toFixed(0)}%`
+                  : "0%"}
               </CircularProgressLabel>
             </CircularProgress>
             <Text>In Progress</Text>
@@ -288,7 +293,12 @@ function WeeklyReport() {
                   {compMemberList?.map((member) => (
                     <Tab key={member._id}>
                       {member.name}{" "}
-                      <Badge mx={1} bgColor='blue.500' color={'white'} transitionDelay='1000ms'>
+                      <Badge
+                        mx={1}
+                        bgColor="blue.500"
+                        color={"white"}
+                        transitionDelay="1000ms"
+                      >
                         {jobList?.filter(
                           (job) =>
                             job.responsible_staff?._id?.includes(member._id) &&
@@ -389,6 +399,7 @@ function WeeklyReport() {
                             <Th>Create date</Th>
                             <Th>Date Finish (Actual)</Th>
                             <Th>Date Finish (Estimate)</Th>
+                            <Th>Time Left</Th>
                             <Th>Delay Reason</Th>
                           </Tr>
                         </Thead>
@@ -402,8 +413,8 @@ function WeeklyReport() {
                             )
                             .sort(
                               (a, b) =>
-                              new Date(a.est_finish_date).getTime() -
-                              new Date(b.est_finish_date).getTime()
+                                new Date(a.est_finish_date).getTime() -
+                                new Date(b.est_finish_date).getTime()
                             )
                             .map((job) => (
                               <Tr key={job._id}>
@@ -422,6 +433,11 @@ function WeeklyReport() {
                                   {moment(job.est_finish_date).format(
                                     "DD/MM/YYYY"
                                   )}
+                                </Td>
+                                <Td>
+                                  {job.progress < 100
+                                    ? moment(job.est_finish_date).fromNow()
+                                    : ""}
                                 </Td>
                                 <Td>{job.delay_reason}</Td>
                               </Tr>

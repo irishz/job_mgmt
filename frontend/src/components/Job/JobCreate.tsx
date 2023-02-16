@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   Divider,
-  Flex,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -11,11 +10,8 @@ import {
   GridItem,
   Heading,
   Input,
-  InputGroup,
-  InputRightAddon,
   List,
   ListItem,
-  Select,
   Stack,
   Text,
   Textarea,
@@ -23,21 +19,15 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
-  DragEvent,
-  DragEventHandler,
-  Key,
-  MutableRefObject,
-  SetStateAction,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import AuthContext from "../Context/AuthContext";
 import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import { SubmitHandler, useForm } from "react-hook-form";
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import JobContext from "../Context/JobContext";
 import { MdCloudUpload } from "react-icons/md";

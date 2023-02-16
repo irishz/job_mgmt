@@ -54,11 +54,9 @@ const jobSchema = new Schema(
         },
         est_finish_date: {
             type: Date,
-            default: new Date(),
         },
         act_finish_date: {
             type: Date,
-            default: new Date(),
         },
         status: {
             type: String,

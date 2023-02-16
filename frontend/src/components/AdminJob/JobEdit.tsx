@@ -28,6 +28,7 @@ import IJob from "../../types/Job/job-types";
 import IProgram from "../../types/Program/ProgramTypes";
 import currency from "../../util/Currency";
 import optStatusList from "../../util/jobStatusList";
+import ErrMessage from "./ErrMessage";
 
 function JobEdit() {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -67,10 +68,12 @@ function JobEdit() {
       customize_cost: customize_cost || 0,
       status: status || "",
       delay_reason: delay_reason || "",
-      act_finish_date:
-        moment(act_finish_date).format("YYYY-MM-DD").toString() || "",
-      est_finish_date:
-        moment(est_finish_date).format("YYYY-MM-DD").toString() || "",
+      act_finish_date: act_finish_date
+        ? moment(est_finish_date).format("YYYY-MM-DD").toString()
+        : "",
+      est_finish_date: est_finish_date
+        ? moment(est_finish_date).format("YYYY-MM-DD").toString()
+        : "",
       job_type: job_type,
     },
   });
@@ -237,42 +240,58 @@ function JobEdit() {
 
           {/* Input Section */}
           <GridItem colSpan={3}>
-            <FormControl isRequired>
-              <FormLabel>Estimate Finish Date</FormLabel>
+            <FormControl>
+              <FormLabel>
+                Estimate Finish Date
+              </FormLabel>
               <Input
+                borderColor={errors.est_finish_date ? "red.400" : "#dfe5ec"}
                 type={"date"}
                 {...register("est_finish_date", {
-                  required: "Please select estimate finish date!",
+                  required: "กรุณาใส่วันที่คาดว่าจะเสร็จ!",
+                  min: {
+                    value: moment().format(),
+                    message: 'วันที่คาดว่าจะเสร็จต้องมากกว่าวันปัจจุบัน'
+                  }
                 })}
               />
+              <ErrMessage message={errors.est_finish_date?.message} />
             </FormControl>
           </GridItem>
           <GridItem colSpan={3}>
             <FormControl>
               <FormLabel>Actual Finish Date</FormLabel>
               <Input
+                borderColor={errors.act_finish_date ? "red.400" : "#dfe5ec"}
                 type={"date"}
-                {...register("act_finish_date")}
+                {...register("act_finish_date", {
+                  required:
+                    watch("status") === "User Training"
+                      ? "กรุณาใส่วันที่ทำเสร็จ"
+                      : false,
+                })}
                 defaultValue=""
               />
+              <ErrMessage message={errors.act_finish_date?.message} />
             </FormControl>
           </GridItem>
           <GridItem colStart={7} colEnd={10}>
             <FormControl>
               <FormLabel>Job Type</FormLabel>
               <Select
+                borderColor={errors.job_type ? "red.400" : "#dfe5ec"}
                 {...register("job_type", { required: "กรุณาเลือกประเภท" })}
                 placeholder={job_type || "Please select type!"}
               >
                 {programList.length > 0
                   ? programList.map(({ type }) => (
-                      <option value={type}>{type}</option>
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
                     ))
                   : null}
               </Select>
-              <FormHelperText color={"red"}>
-                {errors.job_type?.message}
-              </FormHelperText>
+              <ErrMessage message={errors.job_type?.message} />
             </FormControl>
           </GridItem>
           <GridItem colSpan={2} />
@@ -280,16 +299,15 @@ function JobEdit() {
             <FormControl>
               <FormLabel>Job Control By</FormLabel>
               <Select
+                borderColor={errors.control_by ? "red.400" : "#dfe5ec"}
                 {...register("control_by", {
-                  required: "Please select job control by!",
+                  required: "กรุณาเลือกผู้รับผิดชอบ!",
                 })}
               >
                 <option value="computer-staff">Computer Staff</option>
                 <option value="outsource">Outsource</option>
               </Select>
-              <FormHelperText color={"tomato"}>
-                {errors.control_by?.message}
-              </FormHelperText>
+              <ErrMessage message={errors.control_by?.message} />
             </FormControl>
           </GridItem>
           <GridItem colSpan={2}>
@@ -328,9 +346,19 @@ function JobEdit() {
             <FormControl>
               <FormLabel>Reason for delay</FormLabel>
               <Textarea
+                borderColor={errors.delay_reason ? "red.400" : "#dfe5ec"}
                 placeholder="Delay reason..."
-                {...register("delay_reason")}
+                {...register("delay_reason", {
+                  required:
+                    moment(watch("act_finish_date")).diff(
+                      watch("est_finish_date"),
+                      "day"
+                    ) > 0
+                      ? "กรุณาใส่เหตุผลที่งานล่าช้า"
+                      : false,
+                })}
               />
+              <ErrMessage message={errors.delay_reason?.message} />
             </FormControl>
           </GridItem>
         </Grid>
@@ -361,5 +389,4 @@ function JobEdit() {
     </Flex>
   );
 }
-
 export default JobEdit;
